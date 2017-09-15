@@ -237,6 +237,7 @@ class Lightbox extends Component {
 
 		if (image.type && image.type.toLowerCase() === 'video') {
 			item = (<video
+				className={css(classes.image)}
 				src={image.src}
 				style={{
 					cursor: this.props.onClickImage ? 'pointer' : 'auto',
