@@ -200,6 +200,7 @@ class Lightbox extends Component {
 			</Container>
 		);
 	}
+
 	renderImages () {
 		const {
 			currentImage,
@@ -213,10 +214,17 @@ class Lightbox extends Component {
 		if (!images || !images.length) return null;
 
 		const image = images[currentImage];
+
+		// if (image.type && image.type.toLowerCase() === 'video') {
+		//	 return this.renderVideo(image);
+		//
+		// }
+
 		image.srcset = image.srcSet || image.srcset;
 
 		let srcset;
 		let sizes;
+		let item;
 
 		if (image.srcset) {
 			srcset = image.srcset.join();
@@ -227,6 +235,32 @@ class Lightbox extends Component {
 		const heightOffset = `${this.theme.header.height + this.theme.footer.height + thumbnailsSize
 			+ (this.theme.container.gutter.vertical)}px`;
 
+		if (image.type && image.type.toLowerCase() === 'video') {
+			item = (<video
+				src={image.src}
+				style={{
+					cursor: this.props.onClickImage ? 'pointer' : 'auto',
+					maxHeight: `calc(100vh - ${heightOffset})`,
+				}}
+				controls
+			/>);
+
+		} else {
+			item = (<img
+				className={css(classes.image)}
+				onClick={!!onClickImage && onClickImage}
+				sizes={sizes}
+				alt={image.alt}
+				src={image.src}
+				srcSet={srcset}
+				style={{
+					cursor: this.props.onClickImage ? 'pointer' : 'auto',
+					maxHeight: `calc(100vh - ${heightOffset})`,
+				}}
+			/>);
+
+		}
+
 		return (
 			<figure className={css(classes.figure)}>
 				{/*
@@ -234,18 +268,7 @@ class Lightbox extends Component {
 					https://fb.me/react-unknown-prop is resolved
 					<Swipeable onSwipedLeft={this.gotoNext} onSwipedRight={this.gotoPrev} />
 				*/}
-				<img
-					className={css(classes.image)}
-					onClick={!!onClickImage && onClickImage}
-					sizes={sizes}
-					alt={image.alt}
-					src={image.src}
-					srcSet={srcset}
-					style={{
-						cursor: this.props.onClickImage ? 'pointer' : 'auto',
-						maxHeight: `calc(100vh - ${heightOffset})`,
-					}}
-				/>
+				{item}
 				<Footer
 					caption={images[currentImage].caption}
 					countCurrent={currentImage + 1}
