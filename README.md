@@ -1,9 +1,6 @@
 # React Images
 
-[![Join the chat at https://gitter.im/react-images/Lobby](https://badges.gitter.im/react-images/Lobby.svg)](https://gitter.im/react-images/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-A simple, responsive lightbox component for displaying an array of images.
-
+A simple, responsive lightbox component for displaying an array of images or videos.
 
 ### Quick start
 
@@ -34,8 +31,6 @@ export default class Sample extends React.Component {
 
 
 ## Demo & Examples
-
-Live demo: [jossmac.github.io/react-images](http://jossmac.github.io/react-images/)
 
 To build the examples locally, run:
 

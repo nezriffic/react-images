@@ -14,361 +14,378 @@ import Portal from './components/Portal';
 import { bindFunctions, canUseDom, deepMerge } from './utils';
 
 class Lightbox extends Component {
-	constructor (props) {
-		super(props);
-		this.theme = deepMerge(defaultTheme, props.theme);
-		bindFunctions.call(this, [
-			'gotoNext',
-			'gotoPrev',
-			'closeBackdrop',
-			'handleKeyboardInput',
-		]);
-	}
-	getChildContext () {
-		return {
-			theme: this.theme,
-		};
-	}
-	componentDidMount () {
-		if (this.props.isOpen && this.props.enableKeyboardInput) {
-			window.addEventListener('keydown', this.handleKeyboardInput);
-		}
-	}
-	componentWillReceiveProps (nextProps) {
-		if (!canUseDom) return;
+    constructor(props) {
+        super(props);
+        this.theme = deepMerge(defaultTheme, props.theme);
+        bindFunctions.call(this, [
+            'gotoNext',
+            'gotoPrev',
+            'closeBackdrop',
+            'handleKeyboardInput'
+        ]);
+    }
+    getChildContext() {
+        return {
+            theme: this.theme
+        };
+    }
+    componentDidMount() {
+        if (this.props.isOpen && this.props.enableKeyboardInput) {
+            window.addEventListener('keydown', this.handleKeyboardInput);
+        }
+    }
+    componentWillReceiveProps(nextProps) {
+        if (!canUseDom) {
+            return;
+        }
 
-		// preload images
-		if (nextProps.preloadNextImage) {
-			const currentIndex = this.props.currentImage;
-			const nextIndex = nextProps.currentImage + 1;
-			const prevIndex = nextProps.currentImage - 1;
-			let preloadIndex;
+        // preload images
+        if (nextProps.preloadNextImage) {
+            const currentIndex = this.props.currentImage,
+                nextIndex = nextProps.currentImage + 1,
+                prevIndex = nextProps.currentImage - 1;
 
-			if (currentIndex && nextProps.currentImage > currentIndex) {
-				preloadIndex = nextIndex;
-			} else if (currentIndex && nextProps.currentImage < currentIndex) {
-				preloadIndex = prevIndex;
-			}
+            let preloadIndex;
 
-			// if we know the user's direction just get one image
-			// otherwise, to be safe, we need to grab one in each direction
-			if (preloadIndex) {
-				this.preloadImage(preloadIndex);
-			} else {
-				this.preloadImage(prevIndex);
-				this.preloadImage(nextIndex);
-			}
-		}
+            if (currentIndex && nextProps.currentImage > currentIndex) {
+                preloadIndex = nextIndex;
+            } else if (currentIndex && nextProps.currentImage < currentIndex) {
+                preloadIndex = prevIndex;
+            }
 
-		// add/remove event listeners
-		if (!this.props.isOpen && nextProps.isOpen && nextProps.enableKeyboardInput) {
-			window.addEventListener('keydown', this.handleKeyboardInput);
-		}
-		if (!nextProps.isOpen && nextProps.enableKeyboardInput) {
-			window.removeEventListener('keydown', this.handleKeyboardInput);
-		}
-	}
-	componentWillUnmount () {
-		if (this.props.enableKeyboardInput) {
-			window.removeEventListener('keydown', this.handleKeyboardInput);
-		}
-	}
+            // if we know the user's direction just get one image
+            // otherwise, to be safe, we need to grab one in each direction
+            if (preloadIndex) {
+                this.preloadImage(preloadIndex);
+            } else {
+                this.preloadImage(prevIndex);
+                this.preloadImage(nextIndex);
+            }
+        }
 
-	// ==============================
-	// METHODS
-	// ==============================
+        // add/remove event listeners
+        if (!this.props.isOpen && nextProps.isOpen && nextProps.enableKeyboardInput) {
+            window.addEventListener('keydown', this.handleKeyboardInput);
+        }
+        if (!nextProps.isOpen && nextProps.enableKeyboardInput) {
+            window.removeEventListener('keydown', this.handleKeyboardInput);
+        }
+    }
+    componentWillUnmount() {
+        if (this.props.enableKeyboardInput) {
+            window.removeEventListener('keydown', this.handleKeyboardInput);
+        }
+    }
 
-	preloadImage (idx) {
-		const image = this.props.images[idx];
+    // ==============================
+    // METHODS
+    // ==============================
 
-		if (!image) return;
+    preloadImage(idx) {
+        const image = this.props.images[idx];
 
-		const img = new Image();
+        if (!image) {
+            return;
+        }
 
-		img.src = image.src;
-		img.srcset = img.srcSet || img.srcset;
+        let img = new Image();
 
-		if (image.srcset) {
-			img.srcset = image.srcset.join();
-		}
-	}
-	gotoNext (event) {
-		if (this.props.currentImage === (this.props.images.length - 1)) return;
-		if (event) {
-			event.preventDefault();
-			event.stopPropagation();
-		}
-		this.props.onClickNext();
+        img.src = image.src;
+        img.srcset = img.srcSet || img.srcset;
 
-	}
-	gotoPrev (event) {
-		if (this.props.currentImage === 0) return;
-		if (event) {
-			event.preventDefault();
-			event.stopPropagation();
-		}
-		this.props.onClickPrev();
+        if (image.srcset) {
+            img.srcset = image.srcset.join();
+        }
+    }
+    gotoNext(event) {
+        if (this.props.currentImage === (this.props.images.length - 1)) {
+            return;
+        }
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        this.props.onClickNext();
 
-	}
-	closeBackdrop (event) {
-		if (event.target.id === 'lightboxBackdrop') {
-			this.props.onClose();
-		}
-	}
-	handleKeyboardInput (event) {
-		if (event.keyCode === 37) { // left
-			this.gotoPrev(event);
-			return true;
-		} else if (event.keyCode === 39) { // right
-			this.gotoNext(event);
-			return true;
-		} else if (event.keyCode === 27) { // esc
-			this.props.onClose();
-			return true;
-		}
-		return false;
+    }
+    gotoPrev(event) {
+        if (this.props.currentImage === 0) {
+            return;
+        }
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        this.props.onClickPrev();
 
-	}
+    }
+    closeBackdrop(event) {
+        if (event.target.id === 'lightboxBackdrop') {
+            this.props.onClose();
+        }
+    }
+    handleKeyboardInput(event) {
+        if (event.keyCode === 37) { // left
+            this.gotoPrev(event);
+            return true;
+        } else if (event.keyCode === 39) { // right
+            this.gotoNext(event);
+            return true;
+        } else if (event.keyCode === 27) { // esc
+            this.props.onClose();
+            return true;
+        }
+        return false;
 
-	// ==============================
-	// RENDERERS
-	// ==============================
+    }
 
-	renderArrowPrev () {
-		if (this.props.currentImage === 0) return null;
+    // ==============================
+    // RENDERERS
+    // ==============================
 
-		return (
-			<Arrow
-				direction="left"
-				icon="arrowLeft"
-				onClick={this.gotoPrev}
-				title={this.props.leftArrowTitle}
-				type="button"
-			/>
-		);
-	}
-	renderArrowNext () {
-		if (this.props.currentImage === (this.props.images.length - 1)) return null;
+    renderArrowPrev() {
+        if (this.props.currentImage === 0) {
+            return null;
+        }
 
-		return (
-			<Arrow
-				direction="right"
-				icon="arrowRight"
-				onClick={this.gotoNext}
-				title={this.props.rightArrowTitle}
-				type="button"
-			/>
-		);
-	}
-	renderDialog () {
-		const {
-			backdropClosesModal,
-			customControls,
-			isOpen,
-			onClose,
-			showCloseButton,
-			showThumbnails,
-			width,
-		} = this.props;
+        return (
+            <Arrow
+                direction="left"
+                icon="arrowLeft"
+                onClick={this.gotoPrev}
+                title={this.props.leftArrowTitle}
+                type="button"
+            />
+        );
+    }
+    renderArrowNext() {
+        if (this.props.currentImage === (this.props.images.length - 1)) {
+            return null;
+        }
 
-		if (!isOpen) return <span key="closed" />;
+        return (
+            <Arrow
+                direction="right"
+                icon="arrowRight"
+                onClick={this.gotoNext}
+                title={this.props.rightArrowTitle}
+                type="button"
+            />
+        );
+    }
+    renderDialog() {
+        const {
+            backdropClosesModal,
+            customControls,
+            isOpen,
+            onClose,
+            showCloseButton,
+            showThumbnails,
+            width
+        } = this.props;
 
-		let offsetThumbnails = 0;
-		if (showThumbnails) {
-			offsetThumbnails = this.theme.thumbnail.size + this.theme.container.gutter.vertical;
-		}
+        if (!isOpen) {
+            return <span key="closed" />;
+        }
 
-		return (
-			<Container
-				key="open"
-				onClick={!!backdropClosesModal && this.closeBackdrop}
-				onTouchEnd={!!backdropClosesModal && this.closeBackdrop}
-			>
-				<div className={css(classes.content)} style={{ marginBottom: offsetThumbnails, maxWidth: width }}>
-					<Header
-						customControls={customControls}
-						onClose={onClose}
-						showCloseButton={showCloseButton}
-						closeButtonTitle={this.props.closeButtonTitle}
-					/>
-					{this.renderImages()}
-				</div>
-				{this.renderThumbnails()}
-				{this.renderArrowPrev()}
-				{this.renderArrowNext()}
-				<ScrollLock />
-			</Container>
-		);
-	}
+        let offsetThumbnails = 0;
 
-	renderImages () {
-		const {
-			currentImage,
-			images,
-			imageCountSeparator,
-			onClickImage,
-			showImageCount,
-			showThumbnails,
-		} = this.props;
+        if (showThumbnails) {
+            offsetThumbnails = this.theme.thumbnail.size + this.theme.container.gutter.vertical;
+        }
 
-		if (!images || !images.length) return null;
+        return (
+            <Container
+                key="open"
+                onClick={!!backdropClosesModal && this.closeBackdrop}
+                onTouchEnd={!!backdropClosesModal && this.closeBackdrop}
+            >
+                <div className={css(classes.content)} style={{ marginBottom: offsetThumbnails, maxWidth: width }}>
+                    <Header
+                        customControls={customControls}
+                        onClose={onClose}
+                        showCloseButton={showCloseButton}
+                        closeButtonTitle={this.props.closeButtonTitle}
+                    />
+                    {this.renderImages()}
+                </div>
+                {this.renderThumbnails()}
+                {this.renderArrowPrev()}
+                {this.renderArrowNext()}
+                <ScrollLock />
+            </Container>
+        );
+    }
 
-		const image = images[currentImage];
+    renderImages() {
+        const {
+            currentImage,
+            images,
+            imageCountSeparator,
+            onClickImage,
+            showImageCount,
+            showThumbnails
+        } = this.props;
 
-		// if (image.type && image.type.toLowerCase() === 'video') {
-		//	 return this.renderVideo(image);
-		//
-		// }
+        if (!images || !images.length) {
+            return null;
+        }
 
-		image.srcset = image.srcSet || image.srcset;
+        let image = images[currentImage],
+            srcset,
+            sizes,
+            item,
+            thumbnailsSize,
+            heightOffset;
 
-		let srcset;
-		let sizes;
-		let item;
+        image.srcset = image.srcSet || image.srcset;
 
-		if (image.srcset) {
-			srcset = image.srcset.join();
-			sizes = '100vw';
-		}
 
-		const thumbnailsSize = showThumbnails ? this.theme.thumbnail.size : 0;
-		const heightOffset = `${this.theme.header.height + this.theme.footer.height + thumbnailsSize
-			+ (this.theme.container.gutter.vertical)}px`;
+        if (image.srcset) {
+            srcset = image.srcset.join();
+            sizes = '100vw';
+        }
 
-		if (image.type && image.type.toLowerCase() === 'video') {
-			item = (<video
-				className={css(classes.image)}
-				src={image.src}
-				style={{
-					cursor: this.props.onClickImage ? 'pointer' : 'auto',
-					maxHeight: `calc(100vh - ${heightOffset})`,
-				}}
-				controls
-			/>);
+        thumbnailsSize = showThumbnails ? this.theme.thumbnail.size : 0;
+        heightOffset = `${this.theme.header.height + this.theme.footer.height + thumbnailsSize +
+            (this.theme.container.gutter.vertical)}px`;
 
-		} else {
-			item = (<img
-				className={css(classes.image)}
-				onClick={!!onClickImage && onClickImage}
-				sizes={sizes}
-				alt={image.alt}
-				src={image.src}
-				srcSet={srcset}
-				style={{
-					cursor: this.props.onClickImage ? 'pointer' : 'auto',
-					maxHeight: `calc(100vh - ${heightOffset})`,
-				}}
-			/>);
+        if (image.type && image.type.toLowerCase() === 'video') {
+            item = (<video
+                className={css(classes.image)}
+                src={image.src}
+                style={{
+                    cursor: this.props.onClickImage ? 'pointer' : 'auto',
+                    maxHeight: `calc(100vh - ${heightOffset})`
+                }}
+                controls
+            />);
 
-		}
+        } else {
+            item = (<img
+                className={css(classes.image)}
+                onClick={!!onClickImage && onClickImage}
+                sizes={sizes}
+                alt={image.alt}
+                src={image.src}
+                srcSet={srcset}
+                style={{
+                    cursor: this.props.onClickImage ? 'pointer' : 'auto',
+                    maxHeight: `calc(100vh - ${heightOffset})`
+                }}
+            />);
 
-		return (
-			<figure className={css(classes.figure)}>
-				{/*
-					Re-implement when react warning "unknown props"
-					https://fb.me/react-unknown-prop is resolved
-					<Swipeable onSwipedLeft={this.gotoNext} onSwipedRight={this.gotoPrev} />
-				*/}
-				{item}
-				<Footer
-					caption={images[currentImage].caption}
-					countCurrent={currentImage + 1}
-					countSeparator={imageCountSeparator}
-					countTotal={images.length}
-					showCount={showImageCount}
-				/>
-			</figure>
-		);
-	}
-	renderThumbnails () {
-		const { images, currentImage, onClickThumbnail, showThumbnails, thumbnailOffset } = this.props;
+        }
 
-		if (!showThumbnails) return;
+        return (
+            <figure className={css(classes.figure)}>
+                {/*
+                    Re-implement when react warning "unknown props"
+                    https://fb.me/react-unknown-prop is resolved
+                    <Swipeable onSwipedLeft={this.gotoNext} onSwipedRight={this.gotoPrev} />
+                */}
+                {item}
+                <Footer
+                    caption={images[currentImage].caption}
+                    countCurrent={currentImage + 1}
+                    countSeparator={imageCountSeparator}
+                    countTotal={images.length}
+                    showCount={showImageCount}
+                />
+            </figure>
+        );
+    }
+    renderThumbnails() {
+        const { images, currentImage, onClickThumbnail, showThumbnails, thumbnailOffset } = this.props;
 
-		return (
-			<PaginatedThumbnails
-				currentImage={currentImage}
-				images={images}
-				offset={thumbnailOffset}
-				onClickThumbnail={onClickThumbnail}
-			/>
-		);
-	}
-	render () {
-		return (
-			<Portal>
-				{this.renderDialog()}
-			</Portal>
-		);
-	}
+        if (!showThumbnails) {
+            return;
+        }
+
+        return (
+            <PaginatedThumbnails
+                currentImage={currentImage}
+                images={images}
+                offset={thumbnailOffset}
+                onClickThumbnail={onClickThumbnail}
+            />
+        );
+    }
+    render() {
+        return (
+            <Portal>
+                {this.renderDialog()}
+            </Portal>
+        );
+    }
 }
 
 Lightbox.propTypes = {
-	backdropClosesModal: PropTypes.bool,
-	closeButtonTitle: PropTypes.string,
-	currentImage: PropTypes.number,
-	customControls: PropTypes.arrayOf(PropTypes.node),
-	enableKeyboardInput: PropTypes.bool,
-	imageCountSeparator: PropTypes.string,
-	images: PropTypes.arrayOf(
-		PropTypes.shape({
-			src: PropTypes.string.isRequired,
-			srcset: PropTypes.array,
-			caption: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-			thumbnail: PropTypes.string,
-		})
-	).isRequired,
-	isOpen: PropTypes.bool,
-	leftArrowTitle: PropTypes.string,
-	onClickImage: PropTypes.func,
-	onClickNext: PropTypes.func,
-	onClickPrev: PropTypes.func,
-	onClose: PropTypes.func.isRequired,
-	preloadNextImage: PropTypes.bool,
-	rightArrowTitle: PropTypes.string,
-	showCloseButton: PropTypes.bool,
-	showImageCount: PropTypes.bool,
-	showThumbnails: PropTypes.bool,
-	theme: PropTypes.object,
-	thumbnailOffset: PropTypes.number,
-	width: PropTypes.number,
+    backdropClosesModal: PropTypes.bool,
+    closeButtonTitle: PropTypes.string,
+    currentImage: PropTypes.number,
+    customControls: PropTypes.arrayOf(PropTypes.node),
+    enableKeyboardInput: PropTypes.bool,
+    imageCountSeparator: PropTypes.string,
+    images: PropTypes.arrayOf(
+        PropTypes.shape({
+            src: PropTypes.string.isRequired,
+            srcset: PropTypes.array,
+            caption: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+            thumbnail: PropTypes.string
+        })
+    ).isRequired,
+    isOpen: PropTypes.bool,
+    leftArrowTitle: PropTypes.string,
+    onClickImage: PropTypes.func,
+    onClickNext: PropTypes.func,
+    onClickPrev: PropTypes.func,
+    onClose: PropTypes.func.isRequired,
+    preloadNextImage: PropTypes.bool,
+    rightArrowTitle: PropTypes.string,
+    showCloseButton: PropTypes.bool,
+    showImageCount: PropTypes.bool,
+    showThumbnails: PropTypes.bool,
+    theme: PropTypes.object,
+    thumbnailOffset: PropTypes.number,
+    width: PropTypes.number
 };
 Lightbox.defaultProps = {
-	closeButtonTitle: 'Close (Esc)',
-	currentImage: 0,
-	enableKeyboardInput: true,
-	imageCountSeparator: ' of ',
-	leftArrowTitle: 'Previous (Left arrow key)',
-	onClickShowNextImage: true,
-	preloadNextImage: true,
-	rightArrowTitle: 'Next (Right arrow key)',
-	showCloseButton: true,
-	showImageCount: true,
-	theme: {},
-	thumbnailOffset: 2,
-	width: 1024,
+    closeButtonTitle: 'Close (Esc)',
+    currentImage: 0,
+    enableKeyboardInput: true,
+    imageCountSeparator: ' of ',
+    leftArrowTitle: 'Previous (Left arrow key)',
+    onClickShowNextImage: true,
+    preloadNextImage: true,
+    rightArrowTitle: 'Next (Right arrow key)',
+    showCloseButton: true,
+    showImageCount: true,
+    theme: {},
+    thumbnailOffset: 2,
+    width: 1024
 };
 Lightbox.childContextTypes = {
-	theme: PropTypes.object.isRequired,
+    theme: PropTypes.object.isRequired
 };
 
 const classes = StyleSheet.create({
-	content: {
-		position: 'relative',
-	},
-	figure: {
-		margin: 0, // remove browser default
-	},
-	image: {
-		display: 'block', // removes browser default gutter
-		height: 'auto',
-		margin: '0 auto', // maintain center on very short screens OR very narrow image
-		maxWidth: '100%',
+    content: {
+        position: 'relative'
+    },
+    figure: {
+        margin: 0 // remove browser default
+    },
+    image: {
+        display: 'block', // removes browser default gutter
+        height: 'auto',
+        margin: '0 auto', // maintain center on very short screens OR very narrow image
+        maxWidth: '100%',
 
-		// disable user select
-		WebkitTouchCallout: 'none',
-		userSelect: 'none',
-	},
+        // disable user select
+        WebkitTouchCallout: 'none',
+        userSelect: 'none'
+    }
 });
 
 export default Lightbox;

@@ -1,12 +1,12 @@
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import DownloadIcon from './icon';
 
 class DownloadButton extends Component {
-    constructor () {
+    constructor() {
         super();
     }
-    render () {
+    render() {
         return (
             <button
                 title="Download"
@@ -22,7 +22,7 @@ class DownloadButton extends Component {
                     left: -10,
                     top: 0,
                     verticalAlign: 'bottom',
-                    width: 40,
+                    width: 40
                 }}
                 onClick={this.props.handler}
             >
@@ -30,7 +30,7 @@ class DownloadButton extends Component {
                     dangerouslySetInnerHTML={{ __html: DownloadIcon }}
                 />
             </button>
-        )
+        );
     }
 }
 
