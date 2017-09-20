@@ -2659,7 +2659,7 @@ module.exports = warning;
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
-	value: true
+    value: true
 });
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -2717,390 +2717,406 @@ var _componentsPortal2 = _interopRequireDefault(_componentsPortal);
 var _utils = require('./utils');
 
 var Lightbox = (function (_Component) {
-	_inherits(Lightbox, _Component);
+    _inherits(Lightbox, _Component);
 
-	function Lightbox(props) {
-		_classCallCheck(this, Lightbox);
+    function Lightbox(props) {
+        _classCallCheck(this, Lightbox);
 
-		_get(Object.getPrototypeOf(Lightbox.prototype), 'constructor', this).call(this, props);
-		this.theme = (0, _utils.deepMerge)(_theme2['default'], props.theme);
-		_utils.bindFunctions.call(this, ['gotoNext', 'gotoPrev', 'closeBackdrop', 'handleKeyboardInput']);
-	}
+        _get(Object.getPrototypeOf(Lightbox.prototype), 'constructor', this).call(this, props);
+        this.theme = (0, _utils.deepMerge)(_theme2['default'], props.theme);
+        _utils.bindFunctions.call(this, ['gotoNext', 'gotoPrev', 'closeBackdrop', 'handleKeyboardInput']);
+    }
 
-	_createClass(Lightbox, [{
-		key: 'getChildContext',
-		value: function getChildContext() {
-			return {
-				theme: this.theme
-			};
-		}
-	}, {
-		key: 'componentDidMount',
-		value: function componentDidMount() {
-			if (this.props.isOpen && this.props.enableKeyboardInput) {
-				window.addEventListener('keydown', this.handleKeyboardInput);
-			}
-		}
-	}, {
-		key: 'componentWillReceiveProps',
-		value: function componentWillReceiveProps(nextProps) {
-			if (!_utils.canUseDom) return;
+    _createClass(Lightbox, [{
+        key: 'getChildContext',
+        value: function getChildContext() {
+            return {
+                theme: this.theme
+            };
+        }
+    }, {
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            if (this.props.isOpen && this.props.enableKeyboardInput) {
+                window.addEventListener('keydown', this.handleKeyboardInput);
+            }
+        }
+    }, {
+        key: 'componentWillReceiveProps',
+        value: function componentWillReceiveProps(nextProps) {
+            if (!_utils.canUseDom) {
+                return;
+            }
 
-			// preload images
-			if (nextProps.preloadNextImage) {
-				var currentIndex = this.props.currentImage;
-				var nextIndex = nextProps.currentImage + 1;
-				var prevIndex = nextProps.currentImage - 1;
-				var preloadIndex = undefined;
+            // preload images
+            if (nextProps.preloadNextImage) {
+                var currentIndex = this.props.currentImage,
+                    nextIndex = nextProps.currentImage + 1,
+                    prevIndex = nextProps.currentImage - 1;
 
-				if (currentIndex && nextProps.currentImage > currentIndex) {
-					preloadIndex = nextIndex;
-				} else if (currentIndex && nextProps.currentImage < currentIndex) {
-					preloadIndex = prevIndex;
-				}
+                var preloadIndex = undefined;
 
-				// if we know the user's direction just get one image
-				// otherwise, to be safe, we need to grab one in each direction
-				if (preloadIndex) {
-					this.preloadImage(preloadIndex);
-				} else {
-					this.preloadImage(prevIndex);
-					this.preloadImage(nextIndex);
-				}
-			}
+                if (currentIndex && nextProps.currentImage > currentIndex) {
+                    preloadIndex = nextIndex;
+                } else if (currentIndex && nextProps.currentImage < currentIndex) {
+                    preloadIndex = prevIndex;
+                }
 
-			// add/remove event listeners
-			if (!this.props.isOpen && nextProps.isOpen && nextProps.enableKeyboardInput) {
-				window.addEventListener('keydown', this.handleKeyboardInput);
-			}
-			if (!nextProps.isOpen && nextProps.enableKeyboardInput) {
-				window.removeEventListener('keydown', this.handleKeyboardInput);
-			}
-		}
-	}, {
-		key: 'componentWillUnmount',
-		value: function componentWillUnmount() {
-			if (this.props.enableKeyboardInput) {
-				window.removeEventListener('keydown', this.handleKeyboardInput);
-			}
-		}
+                // if we know the user's direction just get one image
+                // otherwise, to be safe, we need to grab one in each direction
+                if (preloadIndex) {
+                    this.preloadImage(preloadIndex);
+                } else {
+                    this.preloadImage(prevIndex);
+                    this.preloadImage(nextIndex);
+                }
+            }
 
-		// ==============================
-		// METHODS
-		// ==============================
+            // add/remove event listeners
+            if (!this.props.isOpen && nextProps.isOpen && nextProps.enableKeyboardInput) {
+                window.addEventListener('keydown', this.handleKeyboardInput);
+            }
+            if (!nextProps.isOpen && nextProps.enableKeyboardInput) {
+                window.removeEventListener('keydown', this.handleKeyboardInput);
+            }
+        }
+    }, {
+        key: 'componentWillUnmount',
+        value: function componentWillUnmount() {
+            if (this.props.enableKeyboardInput) {
+                window.removeEventListener('keydown', this.handleKeyboardInput);
+            }
+        }
 
-	}, {
-		key: 'preloadImage',
-		value: function preloadImage(idx) {
-			var image = this.props.images[idx];
+        // ==============================
+        // METHODS
+        // ==============================
 
-			if (!image) return;
+    }, {
+        key: 'preloadImage',
+        value: function preloadImage(idx) {
+            var image = this.props.images[idx];
 
-			var img = new Image();
+            if (!image) {
+                return;
+            }
 
-			img.src = image.src;
-			img.srcset = img.srcSet || img.srcset;
+            var img = new Image();
 
-			if (image.srcset) {
-				img.srcset = image.srcset.join();
-			}
-		}
-	}, {
-		key: 'gotoNext',
-		value: function gotoNext(event) {
-			if (this.props.currentImage === this.props.images.length - 1) return;
-			if (event) {
-				event.preventDefault();
-				event.stopPropagation();
-			}
-			this.props.onClickNext();
-		}
-	}, {
-		key: 'gotoPrev',
-		value: function gotoPrev(event) {
-			if (this.props.currentImage === 0) return;
-			if (event) {
-				event.preventDefault();
-				event.stopPropagation();
-			}
-			this.props.onClickPrev();
-		}
-	}, {
-		key: 'closeBackdrop',
-		value: function closeBackdrop(event) {
-			if (event.target.id === 'lightboxBackdrop') {
-				this.props.onClose();
-			}
-		}
-	}, {
-		key: 'handleKeyboardInput',
-		value: function handleKeyboardInput(event) {
-			if (event.keyCode === 37) {
-				// left
-				this.gotoPrev(event);
-				return true;
-			} else if (event.keyCode === 39) {
-				// right
-				this.gotoNext(event);
-				return true;
-			} else if (event.keyCode === 27) {
-				// esc
-				this.props.onClose();
-				return true;
-			}
-			return false;
-		}
+            img.src = image.src;
+            img.srcset = img.srcSet || img.srcset;
 
-		// ==============================
-		// RENDERERS
-		// ==============================
+            if (image.srcset) {
+                img.srcset = image.srcset.join();
+            }
+        }
+    }, {
+        key: 'gotoNext',
+        value: function gotoNext(event) {
+            if (this.props.currentImage === this.props.images.length - 1) {
+                return;
+            }
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            this.props.onClickNext();
+        }
+    }, {
+        key: 'gotoPrev',
+        value: function gotoPrev(event) {
+            if (this.props.currentImage === 0) {
+                return;
+            }
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            this.props.onClickPrev();
+        }
+    }, {
+        key: 'closeBackdrop',
+        value: function closeBackdrop(event) {
+            if (event.target.id === 'lightboxBackdrop') {
+                this.props.onClose();
+            }
+        }
+    }, {
+        key: 'handleKeyboardInput',
+        value: function handleKeyboardInput(event) {
+            if (event.keyCode === 37) {
+                // left
+                this.gotoPrev(event);
+                return true;
+            } else if (event.keyCode === 39) {
+                // right
+                this.gotoNext(event);
+                return true;
+            } else if (event.keyCode === 27) {
+                // esc
+                this.props.onClose();
+                return true;
+            }
+            return false;
+        }
 
-	}, {
-		key: 'renderArrowPrev',
-		value: function renderArrowPrev() {
-			if (this.props.currentImage === 0) return null;
+        // ==============================
+        // RENDERERS
+        // ==============================
 
-			return _react2['default'].createElement(_componentsArrow2['default'], {
-				direction: 'left',
-				icon: 'arrowLeft',
-				onClick: this.gotoPrev,
-				title: this.props.leftArrowTitle,
-				type: 'button'
-			});
-		}
-	}, {
-		key: 'renderArrowNext',
-		value: function renderArrowNext() {
-			if (this.props.currentImage === this.props.images.length - 1) return null;
+    }, {
+        key: 'renderArrowPrev',
+        value: function renderArrowPrev() {
+            if (this.props.currentImage === 0) {
+                return null;
+            }
 
-			return _react2['default'].createElement(_componentsArrow2['default'], {
-				direction: 'right',
-				icon: 'arrowRight',
-				onClick: this.gotoNext,
-				title: this.props.rightArrowTitle,
-				type: 'button'
-			});
-		}
-	}, {
-		key: 'renderDialog',
-		value: function renderDialog() {
-			var _props = this.props;
-			var backdropClosesModal = _props.backdropClosesModal;
-			var customControls = _props.customControls;
-			var isOpen = _props.isOpen;
-			var onClose = _props.onClose;
-			var showCloseButton = _props.showCloseButton;
-			var showThumbnails = _props.showThumbnails;
-			var width = _props.width;
+            return _react2['default'].createElement(_componentsArrow2['default'], {
+                direction: 'left',
+                icon: 'arrowLeft',
+                onClick: this.gotoPrev,
+                title: this.props.leftArrowTitle,
+                type: 'button'
+            });
+        }
+    }, {
+        key: 'renderArrowNext',
+        value: function renderArrowNext() {
+            if (this.props.currentImage === this.props.images.length - 1) {
+                return null;
+            }
 
-			if (!isOpen) return _react2['default'].createElement('span', { key: 'closed' });
+            return _react2['default'].createElement(_componentsArrow2['default'], {
+                direction: 'right',
+                icon: 'arrowRight',
+                onClick: this.gotoNext,
+                title: this.props.rightArrowTitle,
+                type: 'button'
+            });
+        }
+    }, {
+        key: 'renderDialog',
+        value: function renderDialog() {
+            var _props = this.props;
+            var backdropClosesModal = _props.backdropClosesModal;
+            var customControls = _props.customControls;
+            var isOpen = _props.isOpen;
+            var onClose = _props.onClose;
+            var showCloseButton = _props.showCloseButton;
+            var showThumbnails = _props.showThumbnails;
+            var width = _props.width;
 
-			var offsetThumbnails = 0;
-			if (showThumbnails) {
-				offsetThumbnails = this.theme.thumbnail.size + this.theme.container.gutter.vertical;
-			}
+            if (!isOpen) {
+                return _react2['default'].createElement('span', { key: 'closed' });
+            }
 
-			return _react2['default'].createElement(
-				_componentsContainer2['default'],
-				{
-					key: 'open',
-					onClick: !!backdropClosesModal && this.closeBackdrop,
-					onTouchEnd: !!backdropClosesModal && this.closeBackdrop
-				},
-				_react2['default'].createElement(
-					'div',
-					{ className: (0, _aphroditeNoImportant.css)(classes.content), style: { marginBottom: offsetThumbnails, maxWidth: width } },
-					_react2['default'].createElement(_componentsHeader2['default'], {
-						customControls: customControls,
-						onClose: onClose,
-						showCloseButton: showCloseButton,
-						closeButtonTitle: this.props.closeButtonTitle
-					}),
-					this.renderImages()
-				),
-				this.renderThumbnails(),
-				this.renderArrowPrev(),
-				this.renderArrowNext(),
-				_react2['default'].createElement(_reactScrolllock2['default'], null)
-			);
-		}
-	}, {
-		key: 'renderImages',
-		value: function renderImages() {
-			var _props2 = this.props;
-			var currentImage = _props2.currentImage;
-			var images = _props2.images;
-			var imageCountSeparator = _props2.imageCountSeparator;
-			var onClickImage = _props2.onClickImage;
-			var showImageCount = _props2.showImageCount;
-			var showThumbnails = _props2.showThumbnails;
+            var offsetThumbnails = 0;
 
-			if (!images || !images.length) return null;
+            if (showThumbnails) {
+                offsetThumbnails = this.theme.thumbnail.size + this.theme.container.gutter.vertical;
+            }
 
-			var image = images[currentImage];
+            return _react2['default'].createElement(
+                _componentsContainer2['default'],
+                {
+                    key: 'open',
+                    onClick: !!backdropClosesModal && this.closeBackdrop,
+                    onTouchEnd: !!backdropClosesModal && this.closeBackdrop
+                },
+                _react2['default'].createElement(
+                    'div',
+                    { className: (0, _aphroditeNoImportant.css)(classes.content), style: { marginBottom: offsetThumbnails, maxWidth: width } },
+                    _react2['default'].createElement(_componentsHeader2['default'], {
+                        customControls: customControls,
+                        onClose: onClose,
+                        showCloseButton: showCloseButton,
+                        closeButtonTitle: this.props.closeButtonTitle
+                    }),
+                    this.renderImages()
+                ),
+                this.renderThumbnails(),
+                this.renderArrowPrev(),
+                this.renderArrowNext(),
+                _react2['default'].createElement(_reactScrolllock2['default'], null)
+            );
+        }
+    }, {
+        key: 'renderImages',
+        value: function renderImages() {
+            var _props2 = this.props;
+            var currentImage = _props2.currentImage;
+            var images = _props2.images;
+            var imageCountSeparator = _props2.imageCountSeparator;
+            var onClickImage = _props2.onClickImage;
+            var showImageCount = _props2.showImageCount;
+            var showThumbnails = _props2.showThumbnails;
 
-			// if (image.type && image.type.toLowerCase() === 'video') {
-			//	 return this.renderVideo(image);
-			//
-			// }
+            if (!images || !images.length) {
+                return null;
+            }
 
-			image.srcset = image.srcSet || image.srcset;
+            var image = images[currentImage],
+                srcset = undefined,
+                sizes = undefined,
+                item = undefined,
+                thumbnailsSize = undefined,
+                heightOffset = undefined;
 
-			var srcset = undefined;
-			var sizes = undefined;
-			var item = undefined;
+            image.srcset = image.srcSet || image.srcset;
 
-			if (image.srcset) {
-				srcset = image.srcset.join();
-				sizes = '100vw';
-			}
+            if (image.srcset) {
+                srcset = image.srcset.join();
+                sizes = '100vw';
+            }
 
-			var thumbnailsSize = showThumbnails ? this.theme.thumbnail.size : 0;
-			var heightOffset = this.theme.header.height + this.theme.footer.height + thumbnailsSize + this.theme.container.gutter.vertical + 'px';
+            thumbnailsSize = showThumbnails ? this.theme.thumbnail.size : 0;
+            heightOffset = this.theme.header.height + this.theme.footer.height + thumbnailsSize + this.theme.container.gutter.vertical + 'px';
 
-			if (image.type && image.type.toLowerCase() === 'video') {
-				item = _react2['default'].createElement('video', {
-					className: (0, _aphroditeNoImportant.css)(classes.image),
-					src: image.src,
-					style: {
-						cursor: this.props.onClickImage ? 'pointer' : 'auto',
-						maxHeight: 'calc(100vh - ' + heightOffset + ')'
-					},
-					controls: true
-				});
-			} else {
-				item = _react2['default'].createElement('img', {
-					className: (0, _aphroditeNoImportant.css)(classes.image),
-					onClick: !!onClickImage && onClickImage,
-					sizes: sizes,
-					alt: image.alt,
-					src: image.src,
-					srcSet: srcset,
-					style: {
-						cursor: this.props.onClickImage ? 'pointer' : 'auto',
-						maxHeight: 'calc(100vh - ' + heightOffset + ')'
-					}
-				});
-			}
+            if (image.type && image.type.toLowerCase() === 'video') {
+                item = _react2['default'].createElement('video', {
+                    className: (0, _aphroditeNoImportant.css)(classes.image),
+                    src: image.src,
+                    style: {
+                        cursor: this.props.onClickImage ? 'pointer' : 'auto',
+                        maxHeight: 'calc(100vh - ' + heightOffset + ')'
+                    },
+                    controls: true
+                });
+            } else {
+                item = _react2['default'].createElement('img', {
+                    className: (0, _aphroditeNoImportant.css)(classes.image),
+                    onClick: !!onClickImage && onClickImage,
+                    sizes: sizes,
+                    alt: image.alt,
+                    src: image.src,
+                    srcSet: srcset,
+                    style: {
+                        cursor: this.props.onClickImage ? 'pointer' : 'auto',
+                        maxHeight: 'calc(100vh - ' + heightOffset + ')'
+                    }
+                });
+            }
 
-			return _react2['default'].createElement(
-				'figure',
-				{ className: (0, _aphroditeNoImportant.css)(classes.figure) },
-				item,
-				_react2['default'].createElement(_componentsFooter2['default'], {
-					caption: images[currentImage].caption,
-					countCurrent: currentImage + 1,
-					countSeparator: imageCountSeparator,
-					countTotal: images.length,
-					showCount: showImageCount
-				})
-			);
-		}
-	}, {
-		key: 'renderThumbnails',
-		value: function renderThumbnails() {
-			var _props3 = this.props;
-			var images = _props3.images;
-			var currentImage = _props3.currentImage;
-			var onClickThumbnail = _props3.onClickThumbnail;
-			var showThumbnails = _props3.showThumbnails;
-			var thumbnailOffset = _props3.thumbnailOffset;
+            return _react2['default'].createElement(
+                'figure',
+                { className: (0, _aphroditeNoImportant.css)(classes.figure) },
+                item,
+                _react2['default'].createElement(_componentsFooter2['default'], {
+                    caption: images[currentImage].caption,
+                    countCurrent: currentImage + 1,
+                    countSeparator: imageCountSeparator,
+                    countTotal: images.length,
+                    showCount: showImageCount
+                })
+            );
+        }
+    }, {
+        key: 'renderThumbnails',
+        value: function renderThumbnails() {
+            var _props3 = this.props;
+            var images = _props3.images;
+            var currentImage = _props3.currentImage;
+            var onClickThumbnail = _props3.onClickThumbnail;
+            var showThumbnails = _props3.showThumbnails;
+            var thumbnailOffset = _props3.thumbnailOffset;
 
-			if (!showThumbnails) return;
+            if (!showThumbnails) {
+                return;
+            }
 
-			return _react2['default'].createElement(_componentsPaginatedThumbnails2['default'], {
-				currentImage: currentImage,
-				images: images,
-				offset: thumbnailOffset,
-				onClickThumbnail: onClickThumbnail
-			});
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			return _react2['default'].createElement(
-				_componentsPortal2['default'],
-				null,
-				this.renderDialog()
-			);
-		}
-	}]);
+            return _react2['default'].createElement(_componentsPaginatedThumbnails2['default'], {
+                currentImage: currentImage,
+                images: images,
+                offset: thumbnailOffset,
+                onClickThumbnail: onClickThumbnail
+            });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            return _react2['default'].createElement(
+                _componentsPortal2['default'],
+                null,
+                this.renderDialog()
+            );
+        }
+    }]);
 
-	return Lightbox;
+    return Lightbox;
 })(_react.Component);
 
 Lightbox.propTypes = {
-	backdropClosesModal: _propTypes2['default'].bool,
-	closeButtonTitle: _propTypes2['default'].string,
-	currentImage: _propTypes2['default'].number,
-	customControls: _propTypes2['default'].arrayOf(_propTypes2['default'].node),
-	enableKeyboardInput: _propTypes2['default'].bool,
-	imageCountSeparator: _propTypes2['default'].string,
-	images: _propTypes2['default'].arrayOf(_propTypes2['default'].shape({
-		src: _propTypes2['default'].string.isRequired,
-		srcset: _propTypes2['default'].array,
-		caption: _propTypes2['default'].oneOfType([_propTypes2['default'].string, _propTypes2['default'].element]),
-		thumbnail: _propTypes2['default'].string
-	})).isRequired,
-	isOpen: _propTypes2['default'].bool,
-	leftArrowTitle: _propTypes2['default'].string,
-	onClickImage: _propTypes2['default'].func,
-	onClickNext: _propTypes2['default'].func,
-	onClickPrev: _propTypes2['default'].func,
-	onClose: _propTypes2['default'].func.isRequired,
-	preloadNextImage: _propTypes2['default'].bool,
-	rightArrowTitle: _propTypes2['default'].string,
-	showCloseButton: _propTypes2['default'].bool,
-	showImageCount: _propTypes2['default'].bool,
-	showThumbnails: _propTypes2['default'].bool,
-	theme: _propTypes2['default'].object,
-	thumbnailOffset: _propTypes2['default'].number,
-	width: _propTypes2['default'].number
+    backdropClosesModal: _propTypes2['default'].bool,
+    closeButtonTitle: _propTypes2['default'].string,
+    currentImage: _propTypes2['default'].number,
+    customControls: _propTypes2['default'].arrayOf(_propTypes2['default'].node),
+    enableKeyboardInput: _propTypes2['default'].bool,
+    imageCountSeparator: _propTypes2['default'].string,
+    images: _propTypes2['default'].arrayOf(_propTypes2['default'].shape({
+        src: _propTypes2['default'].string.isRequired,
+        srcset: _propTypes2['default'].array,
+        caption: _propTypes2['default'].oneOfType([_propTypes2['default'].string, _propTypes2['default'].element]),
+        thumbnail: _propTypes2['default'].string
+    })).isRequired,
+    isOpen: _propTypes2['default'].bool,
+    leftArrowTitle: _propTypes2['default'].string,
+    onClickImage: _propTypes2['default'].func,
+    onClickNext: _propTypes2['default'].func,
+    onClickPrev: _propTypes2['default'].func,
+    onClose: _propTypes2['default'].func.isRequired,
+    preloadNextImage: _propTypes2['default'].bool,
+    rightArrowTitle: _propTypes2['default'].string,
+    showCloseButton: _propTypes2['default'].bool,
+    showImageCount: _propTypes2['default'].bool,
+    showThumbnails: _propTypes2['default'].bool,
+    theme: _propTypes2['default'].object,
+    thumbnailOffset: _propTypes2['default'].number,
+    width: _propTypes2['default'].number
 };
 Lightbox.defaultProps = {
-	closeButtonTitle: 'Close (Esc)',
-	currentImage: 0,
-	enableKeyboardInput: true,
-	imageCountSeparator: ' of ',
-	leftArrowTitle: 'Previous (Left arrow key)',
-	onClickShowNextImage: true,
-	preloadNextImage: true,
-	rightArrowTitle: 'Next (Right arrow key)',
-	showCloseButton: true,
-	showImageCount: true,
-	theme: {},
-	thumbnailOffset: 2,
-	width: 1024
+    closeButtonTitle: 'Close (Esc)',
+    currentImage: 0,
+    enableKeyboardInput: true,
+    imageCountSeparator: ' of ',
+    leftArrowTitle: 'Previous (Left arrow key)',
+    onClickShowNextImage: true,
+    preloadNextImage: true,
+    rightArrowTitle: 'Next (Right arrow key)',
+    showCloseButton: true,
+    showImageCount: true,
+    theme: {},
+    thumbnailOffset: 2,
+    width: 1024
 };
 Lightbox.childContextTypes = {
-	theme: _propTypes2['default'].object.isRequired
+    theme: _propTypes2['default'].object.isRequired
 };
 
 var classes = _aphroditeNoImportant.StyleSheet.create({
-	content: {
-		position: 'relative'
-	},
-	figure: {
-		margin: 0 },
-	// remove browser default
-	image: {
-		display: 'block', // removes browser default gutter
-		height: 'auto',
-		margin: '0 auto', // maintain center on very short screens OR very narrow image
-		maxWidth: '100%',
+    content: {
+        position: 'relative'
+    },
+    figure: {
+        margin: 0 // remove browser default
+    },
+    image: {
+        display: 'block', // removes browser default gutter
+        height: 'auto',
+        margin: '0 auto', // maintain center on very short screens OR very narrow image
+        maxWidth: '100%',
 
-		// disable user select
-		WebkitTouchCallout: 'none',
-		userSelect: 'none'
-	}
+        // disable user select
+        WebkitTouchCallout: 'none',
+        userSelect: 'none'
+    }
 });
 
 exports['default'] = Lightbox;
 module.exports = exports['default'];
 /*
-Re-implement when react warning "unknown props"
-https://fb.me/react-unknown-prop is resolved
-<Swipeable onSwipedLeft={this.gotoNext} onSwipedRight={this.gotoPrev} />
+   Re-implement when react warning "unknown props"
+   https://fb.me/react-unknown-prop is resolved
+   <Swipeable onSwipedLeft={this.gotoNext} onSwipedRight={this.gotoPrev} />
 */
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
@@ -3135,85 +3151,85 @@ var _Icon = require('./Icon');
 var _Icon2 = _interopRequireDefault(_Icon);
 
 function Arrow(_ref, _ref2) {
-	var direction = _ref.direction;
-	var icon = _ref.icon;
-	var onClick = _ref.onClick;
-	var size = _ref.size;
+    var direction = _ref.direction;
+    var icon = _ref.icon;
+    var onClick = _ref.onClick;
+    var size = _ref.size;
 
-	var props = _objectWithoutProperties(_ref, ['direction', 'icon', 'onClick', 'size']);
+    var props = _objectWithoutProperties(_ref, ['direction', 'icon', 'onClick', 'size']);
 
-	var theme = _ref2.theme;
+    var theme = _ref2.theme;
 
-	var classes = _aphroditeNoImportant.StyleSheet.create((0, _utils.deepMerge)(defaultStyles, theme));
+    var classes = _aphroditeNoImportant.StyleSheet.create((0, _utils.deepMerge)(defaultStyles, theme));
 
-	return _react2['default'].createElement(
-		'button',
-		_extends({
-			type: 'button',
-			className: (0, _aphroditeNoImportant.css)(classes.arrow, classes['arrow__direction__' + direction], size && classes['arrow__size__' + size]),
-			onClick: onClick,
-			onTouchEnd: onClick
-		}, props),
-		_react2['default'].createElement(_Icon2['default'], { fill: !!theme.arrow && theme.arrow.fill || _theme2['default'].arrow.fill, type: icon })
-	);
+    return _react2['default'].createElement(
+        'button',
+        _extends({
+            type: 'button',
+            className: (0, _aphroditeNoImportant.css)(classes.arrow, classes['arrow__direction__' + direction], size && classes['arrow__size__' + size]),
+            onClick: onClick,
+            onTouchEnd: onClick
+        }, props),
+        _react2['default'].createElement(_Icon2['default'], { fill: !!theme.arrow && theme.arrow.fill || _theme2['default'].arrow.fill, type: icon })
+    );
 }
 
 Arrow.propTypes = {
-	direction: _propTypes2['default'].oneOf(['left', 'right']),
-	icon: _propTypes2['default'].string,
-	onClick: _propTypes2['default'].func.isRequired,
-	size: _propTypes2['default'].oneOf(['medium', 'small']).isRequired
+    direction: _propTypes2['default'].oneOf(['left', 'right']),
+    icon: _propTypes2['default'].string,
+    onClick: _propTypes2['default'].func.isRequired,
+    size: _propTypes2['default'].oneOf(['medium', 'small']).isRequired
 };
 Arrow.defaultProps = {
-	size: 'medium'
+    size: 'medium'
 };
 Arrow.contextTypes = {
-	theme: _propTypes2['default'].object.isRequired
+    theme: _propTypes2['default'].object.isRequired
 };
 
 var defaultStyles = {
-	arrow: {
-		background: 'none',
-		border: 'none',
-		borderRadius: 4,
-		cursor: 'pointer',
-		outline: 'none',
-		padding: 10, // increase hit area
-		position: 'absolute',
-		top: '50%',
+    arrow: {
+        background: 'none',
+        border: 'none',
+        borderRadius: 4,
+        cursor: 'pointer',
+        outline: 'none',
+        padding: 10, // increase hit area
+        position: 'absolute',
+        top: '50%',
 
-		// disable user select
-		WebkitTouchCallout: 'none',
-		userSelect: 'none'
-	},
+        // disable user select
+        WebkitTouchCallout: 'none',
+        userSelect: 'none'
+    },
 
-	// sizees
-	arrow__size__medium: {
-		height: _theme2['default'].arrow.height,
-		marginTop: _theme2['default'].arrow.height / -2,
-		width: 40,
+    // sizees
+    arrow__size__medium: {
+        height: _theme2['default'].arrow.height,
+        marginTop: _theme2['default'].arrow.height / -2,
+        width: 40,
 
-		'@media (min-width: 768px)': {
-			width: 70
-		}
-	},
-	arrow__size__small: {
-		height: _theme2['default'].thumbnail.size,
-		marginTop: _theme2['default'].thumbnail.size / -2,
-		width: 30,
+        '@media (min-width: 768px)': {
+            width: 70
+        }
+    },
+    arrow__size__small: {
+        height: _theme2['default'].thumbnail.size,
+        marginTop: _theme2['default'].thumbnail.size / -2,
+        width: 30,
 
-		'@media (min-width: 500px)': {
-			width: 40
-		}
-	},
+        '@media (min-width: 500px)': {
+            width: 40
+        }
+    },
 
-	// direction
-	arrow__direction__right: {
-		right: _theme2['default'].container.gutter.horizontal
-	},
-	arrow__direction__left: {
-		left: _theme2['default'].container.gutter.horizontal
-	}
+    // direction
+    arrow__direction__right: {
+        right: _theme2['default'].container.gutter.horizontal
+    },
+    arrow__direction__left: {
+        left: _theme2['default'].container.gutter.horizontal
+    }
 };
 
 module.exports = Arrow;
@@ -3246,39 +3262,39 @@ var _theme2 = _interopRequireDefault(_theme);
 var _utils = require('../utils');
 
 function Container(_ref, _ref2) {
-	var props = _objectWithoutProperties(_ref, []);
+    var props = _objectWithoutProperties(_ref, []);
 
-	var theme = _ref2.theme;
+    var theme = _ref2.theme;
 
-	var classes = _aphroditeNoImportant.StyleSheet.create((0, _utils.deepMerge)(defaultStyles, theme));
+    var classes = _aphroditeNoImportant.StyleSheet.create((0, _utils.deepMerge)(defaultStyles, theme));
 
-	return _react2['default'].createElement('div', _extends({ id: 'lightboxBackdrop',
-		className: (0, _aphroditeNoImportant.css)(classes.container)
-	}, props));
+    return _react2['default'].createElement('div', _extends({ id: 'lightboxBackdrop',
+        className: (0, _aphroditeNoImportant.css)(classes.container)
+    }, props));
 }
 
 Container.contextTypes = {
-	theme: _propTypes2['default'].object.isRequired
+    theme: _propTypes2['default'].object.isRequired
 };
 
 var defaultStyles = {
-	container: {
-		alignItems: 'center',
-		backgroundColor: _theme2['default'].container.background,
-		boxSizing: 'border-box',
-		display: 'flex',
-		height: '100%',
-		justifyContent: 'center',
-		left: 0,
-		paddingBottom: _theme2['default'].container.gutter.vertical,
-		paddingLeft: _theme2['default'].container.gutter.horizontal,
-		paddingRight: _theme2['default'].container.gutter.horizontal,
-		paddingTop: _theme2['default'].container.gutter.vertical,
-		position: 'fixed',
-		top: 0,
-		width: '100%',
-		zIndex: _theme2['default'].container.zIndex
-	}
+    container: {
+        alignItems: 'center',
+        backgroundColor: _theme2['default'].container.background,
+        boxSizing: 'border-box',
+        display: 'flex',
+        height: '100%',
+        justifyContent: 'center',
+        left: 0,
+        paddingBottom: _theme2['default'].container.gutter.vertical,
+        paddingLeft: _theme2['default'].container.gutter.horizontal,
+        paddingRight: _theme2['default'].container.gutter.horizontal,
+        paddingTop: _theme2['default'].container.gutter.vertical,
+        position: 'fixed',
+        top: 0,
+        width: '100%',
+        zIndex: _theme2['default'].container.zIndex
+    }
 };
 
 module.exports = Container;
@@ -3311,73 +3327,74 @@ var _theme2 = _interopRequireDefault(_theme);
 var _utils = require('../utils');
 
 function Footer(_ref, _ref2) {
-	var caption = _ref.caption;
-	var countCurrent = _ref.countCurrent;
-	var countSeparator = _ref.countSeparator;
-	var countTotal = _ref.countTotal;
-	var showCount = _ref.showCount;
+    var caption = _ref.caption;
+    var countCurrent = _ref.countCurrent;
+    var countSeparator = _ref.countSeparator;
+    var countTotal = _ref.countTotal;
+    var showCount = _ref.showCount;
 
-	var props = _objectWithoutProperties(_ref, ['caption', 'countCurrent', 'countSeparator', 'countTotal', 'showCount']);
+    var props = _objectWithoutProperties(_ref, ['caption', 'countCurrent', 'countSeparator', 'countTotal', 'showCount']);
 
-	var theme = _ref2.theme;
+    var theme = _ref2.theme;
 
-	if (!caption && !showCount) return null;
+    if (!caption && !showCount) {
+        return null;
+    }
 
-	var classes = _aphroditeNoImportant.StyleSheet.create((0, _utils.deepMerge)(defaultStyles, theme));
+    var classes = _aphroditeNoImportant.StyleSheet.create((0, _utils.deepMerge)(defaultStyles, theme)),
+        imageCount = showCount ? _react2['default'].createElement(
+        'div',
+        { className: (0, _aphroditeNoImportant.css)(classes.footerCount) },
+        countCurrent,
+        countSeparator,
+        countTotal
+    ) : _react2['default'].createElement('span', null);
 
-	var imageCount = showCount ? _react2['default'].createElement(
-		'div',
-		{ className: (0, _aphroditeNoImportant.css)(classes.footerCount) },
-		countCurrent,
-		countSeparator,
-		countTotal
-	) : _react2['default'].createElement('span', null);
-
-	return _react2['default'].createElement(
-		'div',
-		_extends({ className: (0, _aphroditeNoImportant.css)(classes.footer) }, props),
-		caption ? _react2['default'].createElement(
-			'figcaption',
-			{ className: (0, _aphroditeNoImportant.css)(classes.footerCaption) },
-			caption
-		) : _react2['default'].createElement('span', null),
-		imageCount
-	);
+    return _react2['default'].createElement(
+        'div',
+        _extends({ className: (0, _aphroditeNoImportant.css)(classes.footer) }, props),
+        caption ? _react2['default'].createElement(
+            'figcaption',
+            { className: (0, _aphroditeNoImportant.css)(classes.footerCaption) },
+            caption
+        ) : _react2['default'].createElement('span', null),
+        imageCount
+    );
 }
 
 Footer.propTypes = {
-	caption: _propTypes2['default'].oneOfType([_propTypes2['default'].string, _propTypes2['default'].element]),
-	countCurrent: _propTypes2['default'].number,
-	countSeparator: _propTypes2['default'].string,
-	countTotal: _propTypes2['default'].number,
-	showCount: _propTypes2['default'].bool
+    caption: _propTypes2['default'].oneOfType([_propTypes2['default'].string, _propTypes2['default'].element]),
+    countCurrent: _propTypes2['default'].number,
+    countSeparator: _propTypes2['default'].string,
+    countTotal: _propTypes2['default'].number,
+    showCount: _propTypes2['default'].bool
 };
 Footer.contextTypes = {
-	theme: _propTypes2['default'].object.isRequired
+    theme: _propTypes2['default'].object.isRequired
 };
 
 var defaultStyles = {
-	footer: {
-		boxSizing: 'border-box',
-		color: _theme2['default'].footer.color,
-		cursor: 'auto',
-		display: 'flex',
-		justifyContent: 'space-between',
-		left: 0,
-		lineHeight: 1.3,
-		paddingBottom: _theme2['default'].footer.gutter.vertical,
-		paddingLeft: _theme2['default'].footer.gutter.horizontal,
-		paddingRight: _theme2['default'].footer.gutter.horizontal,
-		paddingTop: _theme2['default'].footer.gutter.vertical
-	},
-	footerCount: {
-		color: _theme2['default'].footer.count.color,
-		fontSize: _theme2['default'].footer.count.fontSize,
-		paddingLeft: '1em' },
-	// add a small gutter for the caption
-	footerCaption: {
-		flex: '1 1 0'
-	}
+    footer: {
+        boxSizing: 'border-box',
+        color: _theme2['default'].footer.color,
+        cursor: 'auto',
+        display: 'flex',
+        justifyContent: 'space-between',
+        left: 0,
+        lineHeight: 1.3,
+        paddingBottom: _theme2['default'].footer.gutter.vertical,
+        paddingLeft: _theme2['default'].footer.gutter.horizontal,
+        paddingRight: _theme2['default'].footer.gutter.horizontal,
+        paddingTop: _theme2['default'].footer.gutter.vertical
+    },
+    footerCount: {
+        color: _theme2['default'].footer.count.color,
+        fontSize: _theme2['default'].footer.count.fontSize,
+        paddingLeft: '1em' // add a small gutter for the caption
+    },
+    footerCaption: {
+        flex: '1 1 0'
+    }
 };
 
 module.exports = Footer;
@@ -3414,63 +3431,63 @@ var _Icon = require('./Icon');
 var _Icon2 = _interopRequireDefault(_Icon);
 
 function Header(_ref, _ref2) {
-	var customControls = _ref.customControls;
-	var onClose = _ref.onClose;
-	var showCloseButton = _ref.showCloseButton;
-	var closeButtonTitle = _ref.closeButtonTitle;
+    var customControls = _ref.customControls;
+    var onClose = _ref.onClose;
+    var showCloseButton = _ref.showCloseButton;
+    var closeButtonTitle = _ref.closeButtonTitle;
 
-	var props = _objectWithoutProperties(_ref, ['customControls', 'onClose', 'showCloseButton', 'closeButtonTitle']);
+    var props = _objectWithoutProperties(_ref, ['customControls', 'onClose', 'showCloseButton', 'closeButtonTitle']);
 
-	var theme = _ref2.theme;
+    var theme = _ref2.theme;
 
-	var classes = _aphroditeNoImportant.StyleSheet.create((0, _utils.deepMerge)(defaultStyles, theme));
+    var classes = _aphroditeNoImportant.StyleSheet.create((0, _utils.deepMerge)(defaultStyles, theme));
 
-	return _react2['default'].createElement(
-		'div',
-		_extends({ className: (0, _aphroditeNoImportant.css)(classes.header) }, props),
-		customControls ? customControls : _react2['default'].createElement('span', null),
-		!!showCloseButton && _react2['default'].createElement(
-			'button',
-			{
-				title: closeButtonTitle,
-				className: (0, _aphroditeNoImportant.css)(classes.close),
-				onClick: onClose
-			},
-			_react2['default'].createElement(_Icon2['default'], { fill: !!theme.close && theme.close.fill || _theme2['default'].close.fill, type: 'close' })
-		)
-	);
+    return _react2['default'].createElement(
+        'div',
+        _extends({ className: (0, _aphroditeNoImportant.css)(classes.header) }, props),
+        customControls ? customControls : _react2['default'].createElement('span', null),
+        !!showCloseButton && _react2['default'].createElement(
+            'button',
+            {
+                title: closeButtonTitle,
+                className: (0, _aphroditeNoImportant.css)(classes.close),
+                onClick: onClose
+            },
+            _react2['default'].createElement(_Icon2['default'], { fill: !!theme.close && theme.close.fill || _theme2['default'].close.fill, type: 'close' })
+        )
+    );
 }
 
 Header.propTypes = {
-	customControls: _propTypes2['default'].array,
-	onClose: _propTypes2['default'].func.isRequired,
-	showCloseButton: _propTypes2['default'].bool
+    customControls: _propTypes2['default'].array,
+    onClose: _propTypes2['default'].func.isRequired,
+    showCloseButton: _propTypes2['default'].bool
 };
 Header.contextTypes = {
-	theme: _propTypes2['default'].object.isRequired
+    theme: _propTypes2['default'].object.isRequired
 };
 
 var defaultStyles = {
-	header: {
-		display: 'flex',
-		justifyContent: 'space-between',
-		height: _theme2['default'].header.height
-	},
-	close: {
-		background: 'none',
-		border: 'none',
-		cursor: 'pointer',
-		outline: 'none',
-		position: 'relative',
-		top: 0,
-		verticalAlign: 'bottom',
+    header: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        height: _theme2['default'].header.height
+    },
+    close: {
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        outline: 'none',
+        position: 'relative',
+        top: 0,
+        verticalAlign: 'bottom',
 
-		// increase hit area
-		height: 40,
-		marginRight: -10,
-		padding: 10,
-		width: 40
-	}
+        // increase hit area
+        height: 40,
+        marginRight: -10,
+        padding: 10,
+        width: 40
+    }
 };
 
 module.exports = Header;
@@ -3481,7 +3498,7 @@ module.exports = Header;
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
-	value: true
+    value: true
 });
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -3503,24 +3520,24 @@ var _icons = require('../icons');
 var _icons2 = _interopRequireDefault(_icons);
 
 var Icon = function Icon(_ref) {
-	var fill = _ref.fill;
-	var type = _ref.type;
+    var fill = _ref.fill;
+    var type = _ref.type;
 
-	var props = _objectWithoutProperties(_ref, ['fill', 'type']);
+    var props = _objectWithoutProperties(_ref, ['fill', 'type']);
 
-	var icon = _icons2['default'][type];
+    var icon = _icons2['default'][type];
 
-	return _react2['default'].createElement('span', _extends({
-		dangerouslySetInnerHTML: { __html: icon(fill) }
-	}, props));
+    return _react2['default'].createElement('span', _extends({
+        dangerouslySetInnerHTML: { __html: icon(fill) }
+    }, props));
 };
 
 Icon.propTypes = {
-	fill: _propTypes2['default'].string,
-	type: _propTypes2['default'].oneOf(Object.keys(_icons2['default']))
+    fill: _propTypes2['default'].string,
+    type: _propTypes2['default'].oneOf(Object.keys(_icons2['default']))
 };
 Icon.defaultProps = {
-	fill: 'white'
+    fill: 'white'
 };
 
 exports['default'] = Icon;
@@ -3532,7 +3549,7 @@ module.exports = exports['default'];
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
-	value: true
+    value: true
 });
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -3570,195 +3587,200 @@ var _theme = require('../theme');
 var _theme2 = _interopRequireDefault(_theme);
 
 var classes = _aphroditeNoImportant.StyleSheet.create({
-	paginatedThumbnails: {
-		bottom: _theme2['default'].container.gutter.vertical,
-		height: _theme2['default'].thumbnail.size,
-		padding: '0 50px',
-		position: 'absolute',
-		textAlign: 'center',
-		whiteSpace: 'nowrap'
-	}
-});
-
-var arrowStyles = {
-	height: _theme2['default'].thumbnail.size + _theme2['default'].thumbnail.gutter * 2,
-	width: 40
+    paginatedThumbnails: {
+        bottom: _theme2['default'].container.gutter.vertical,
+        height: _theme2['default'].thumbnail.size,
+        padding: '0 50px',
+        position: 'absolute',
+        textAlign: 'center',
+        whiteSpace: 'nowrap'
+    }
+}),
+    arrowStyles = {
+    height: _theme2['default'].thumbnail.size + _theme2['default'].thumbnail.gutter * 2,
+    width: 40
 };
 
 var PaginatedThumbnails = (function (_Component) {
-	_inherits(PaginatedThumbnails, _Component);
+    _inherits(PaginatedThumbnails, _Component);
 
-	function PaginatedThumbnails(props) {
-		_classCallCheck(this, PaginatedThumbnails);
+    function PaginatedThumbnails(props) {
+        _classCallCheck(this, PaginatedThumbnails);
 
-		_get(Object.getPrototypeOf(PaginatedThumbnails.prototype), 'constructor', this).call(this, props);
+        _get(Object.getPrototypeOf(PaginatedThumbnails.prototype), 'constructor', this).call(this, props);
 
-		this.state = {
-			hasCustomPage: false
-		};
+        this.state = {
+            hasCustomPage: false
+        };
 
-		this.gotoPrev = this.gotoPrev.bind(this);
-		this.gotoNext = this.gotoNext.bind(this);
-	}
+        this.gotoPrev = this.gotoPrev.bind(this);
+        this.gotoNext = this.gotoNext.bind(this);
+    }
 
-	_createClass(PaginatedThumbnails, [{
-		key: 'componentWillReceiveProps',
-		value: function componentWillReceiveProps(nextProps) {
-			// Component should be controlled, flush state when currentImage changes
-			if (nextProps.currentImage !== this.props.currentImage) {
-				this.setState({
-					hasCustomPage: false
-				});
-			}
-		}
+    _createClass(PaginatedThumbnails, [{
+        key: 'componentWillReceiveProps',
+        value: function componentWillReceiveProps(nextProps) {
+            // Component should be controlled, flush state when currentImage changes
+            if (nextProps.currentImage !== this.props.currentImage) {
+                this.setState({
+                    hasCustomPage: false
+                });
+            }
+        }
 
-		// ==============================
-		// METHODS
-		// ==============================
+        // ==============================
+        // METHODS
+        // ==============================
 
-	}, {
-		key: 'getFirst',
-		value: function getFirst() {
-			var _props = this.props;
-			var currentImage = _props.currentImage;
-			var offset = _props.offset;
+    }, {
+        key: 'getFirst',
+        value: function getFirst() {
+            var _props = this.props;
+            var currentImage = _props.currentImage;
+            var offset = _props.offset;
 
-			if (this.state.hasCustomPage) {
-				return this.clampFirst(this.state.first);
-			}
-			return this.clampFirst(currentImage - offset);
-		}
-	}, {
-		key: 'setFirst',
-		value: function setFirst(event, newFirst) {
-			var first = this.state.first;
+            if (this.state.hasCustomPage) {
+                return this.clampFirst(this.state.first);
+            }
+            return this.clampFirst(currentImage - offset);
+        }
+    }, {
+        key: 'setFirst',
+        value: function setFirst(event, newFirst) {
+            var first = this.state.first;
 
-			if (event) {
-				event.preventDefault();
-				event.stopPropagation();
-			}
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
 
-			if (first === newFirst) return;
+            if (first === newFirst) {
+                return;
+            }
 
-			this.setState({
-				hasCustomPage: true,
-				first: newFirst
-			});
-		}
-	}, {
-		key: 'gotoPrev',
-		value: function gotoPrev(event) {
-			this.setFirst(event, this.getFirst() - this.props.offset);
-		}
-	}, {
-		key: 'gotoNext',
-		value: function gotoNext(event) {
-			this.setFirst(event, this.getFirst() + this.props.offset);
-		}
-	}, {
-		key: 'clampFirst',
-		value: function clampFirst(value) {
-			var _props2 = this.props;
-			var images = _props2.images;
-			var offset = _props2.offset;
+            this.setState({
+                hasCustomPage: true,
+                first: newFirst
+            });
+        }
+    }, {
+        key: 'gotoPrev',
+        value: function gotoPrev(event) {
+            this.setFirst(event, this.getFirst() - this.props.offset);
+        }
+    }, {
+        key: 'gotoNext',
+        value: function gotoNext(event) {
+            this.setFirst(event, this.getFirst() + this.props.offset);
+        }
+    }, {
+        key: 'clampFirst',
+        value: function clampFirst(value) {
+            var _props2 = this.props;
+            var images = _props2.images;
+            var offset = _props2.offset;
+            var totalCount = 2 * offset + 1; // show $offset extra thumbnails on each side
 
-			var totalCount = 2 * offset + 1; // show $offset extra thumbnails on each side
+            if (value < 0) {
+                return 0;
+            } else if (value + totalCount > images.length) {
+                // Too far
+                return images.length - totalCount;
+            }
 
-			if (value < 0) {
-				return 0;
-			} else if (value + totalCount > images.length) {
-				// Too far
-				return images.length - totalCount;
-			} else {
-				return value;
-			}
-		}
+            return value;
+        }
 
-		// ==============================
-		// RENDERERS
-		// ==============================
+        // ==============================
+        // RENDERERS
+        // ==============================
 
-	}, {
-		key: 'renderArrowPrev',
-		value: function renderArrowPrev() {
-			if (this.getFirst() <= 0) return null;
+    }, {
+        key: 'renderArrowPrev',
+        value: function renderArrowPrev() {
+            if (this.getFirst() <= 0) {
+                return null;
+            }
 
-			return _react2['default'].createElement(_Arrow2['default'], {
-				direction: 'left',
-				size: 'small',
-				icon: 'arrowLeft',
-				onClick: this.gotoPrev,
-				style: arrowStyles,
-				title: 'Previous (Left arrow key)',
-				type: 'button'
-			});
-		}
-	}, {
-		key: 'renderArrowNext',
-		value: function renderArrowNext() {
-			var _props3 = this.props;
-			var offset = _props3.offset;
-			var images = _props3.images;
+            return _react2['default'].createElement(_Arrow2['default'], {
+                direction: 'left',
+                size: 'small',
+                icon: 'arrowLeft',
+                onClick: this.gotoPrev,
+                style: arrowStyles,
+                title: 'Previous (Left arrow key)',
+                type: 'button'
+            });
+        }
+    }, {
+        key: 'renderArrowNext',
+        value: function renderArrowNext() {
+            var _props3 = this.props;
+            var offset = _props3.offset;
+            var images = _props3.images;
+            var totalCount = 2 * offset + 1;
 
-			var totalCount = 2 * offset + 1;
-			if (this.getFirst() + totalCount >= images.length) return null;
+            if (this.getFirst() + totalCount >= images.length) {
+                return null;
+            }
 
-			return _react2['default'].createElement(_Arrow2['default'], {
-				direction: 'right',
-				size: 'small',
-				icon: 'arrowRight',
-				onClick: this.gotoNext,
-				style: arrowStyles,
-				title: 'Next (Right arrow key)',
-				type: 'button'
-			});
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var _props4 = this.props;
-			var images = _props4.images;
-			var currentImage = _props4.currentImage;
-			var onClickThumbnail = _props4.onClickThumbnail;
-			var offset = _props4.offset;
+            return _react2['default'].createElement(_Arrow2['default'], {
+                direction: 'right',
+                size: 'small',
+                icon: 'arrowRight',
+                onClick: this.gotoNext,
+                style: arrowStyles,
+                title: 'Next (Right arrow key)',
+                type: 'button'
+            });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _props4 = this.props;
+            var images = _props4.images;
+            var currentImage = _props4.currentImage;
+            var onClickThumbnail = _props4.onClickThumbnail;
+            var offset = _props4.offset;
+            var totalCount = 2 * offset + 1; // show $offset extra thumbnails on each side
 
-			var totalCount = 2 * offset + 1; // show $offset extra thumbnails on each side
-			var thumbnails = [];
-			var baseOffset = 0;
-			if (images.length <= totalCount) {
-				thumbnails = images;
-			} else {
-				// Try to center current image in list
-				baseOffset = this.getFirst();
-				thumbnails = images.slice(baseOffset, baseOffset + totalCount);
-			}
+            var thumbnails = [],
+                baseOffset = 0;
 
-			return _react2['default'].createElement(
-				'div',
-				{ className: (0, _aphroditeNoImportant.css)(classes.paginatedThumbnails) },
-				this.renderArrowPrev(),
-				thumbnails.map(function (img, idx) {
-					return _react2['default'].createElement(_Thumbnail2['default'], _extends({ key: baseOffset + idx
-					}, img, {
-						index: baseOffset + idx,
-						onClick: onClickThumbnail,
-						active: baseOffset + idx === currentImage }));
-				}),
-				this.renderArrowNext()
-			);
-		}
-	}]);
+            if (images.length <= totalCount) {
+                thumbnails = images;
+            } else {
+                // Try to center current image in list
+                baseOffset = this.getFirst();
+                thumbnails = images.slice(baseOffset, baseOffset + totalCount);
+            }
 
-	return PaginatedThumbnails;
+            return _react2['default'].createElement(
+                'div',
+                { className: (0, _aphroditeNoImportant.css)(classes.paginatedThumbnails) },
+                this.renderArrowPrev(),
+                thumbnails.map(function (img, idx) {
+                    return _react2['default'].createElement(_Thumbnail2['default'], _extends({ key: baseOffset + idx
+                    }, img, {
+                        index: baseOffset + idx,
+                        onClick: onClickThumbnail,
+                        active: baseOffset + idx === currentImage }));
+                }),
+                this.renderArrowNext()
+            );
+        }
+    }]);
+
+    return PaginatedThumbnails;
 })(_react.Component);
 
 exports['default'] = PaginatedThumbnails;
 
 PaginatedThumbnails.propTypes = {
-	currentImage: _propTypes2['default'].number,
-	images: _propTypes2['default'].array,
-	offset: _propTypes2['default'].number,
-	onClickThumbnail: _propTypes2['default'].func.isRequired
+    currentImage: _propTypes2['default'].number,
+    images: _propTypes2['default'].array,
+    offset: _propTypes2['default'].number,
+    onClickThumbnail: _propTypes2['default'].func.isRequired
 };
 module.exports = exports['default'];
 
@@ -3768,7 +3790,7 @@ module.exports = exports['default'];
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
-	value: true
+    value: true
 });
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -3791,34 +3813,34 @@ var _react = (typeof window !== "undefined" ? window['React'] : typeof global !=
 // StackOverflow discussion http://goo.gl/oclrJ9
 
 var PassContext = (function (_Component) {
-	_inherits(PassContext, _Component);
+    _inherits(PassContext, _Component);
 
-	function PassContext() {
-		_classCallCheck(this, PassContext);
+    function PassContext() {
+        _classCallCheck(this, PassContext);
 
-		_get(Object.getPrototypeOf(PassContext.prototype), 'constructor', this).apply(this, arguments);
-	}
+        _get(Object.getPrototypeOf(PassContext.prototype), 'constructor', this).apply(this, arguments);
+    }
 
-	_createClass(PassContext, [{
-		key: 'getChildContext',
-		value: function getChildContext() {
-			return this.props.context;
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			return _react.Children.only(this.props.children);
-		}
-	}]);
+    _createClass(PassContext, [{
+        key: 'getChildContext',
+        value: function getChildContext() {
+            return this.props.context;
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            return _react.Children.only(this.props.children);
+        }
+    }]);
 
-	return PassContext;
+    return PassContext;
 })(_react.Component);
 
 PassContext.propTypes = {
-	context: _propTypes2['default'].object.isRequired
+    context: _propTypes2['default'].object.isRequired
 };
 PassContext.childContextTypes = {
-	theme: _propTypes2['default'].object
+    theme: _propTypes2['default'].object
 };
 
 exports['default'] = PassContext;
@@ -3830,7 +3852,7 @@ module.exports = exports['default'];
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
-	value: true
+    value: true
 });
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -3864,69 +3886,70 @@ var _PassContext = require('./PassContext');
 var _PassContext2 = _interopRequireDefault(_PassContext);
 
 var Portal = (function (_Component) {
-	_inherits(Portal, _Component);
+    _inherits(Portal, _Component);
 
-	function Portal() {
-		_classCallCheck(this, Portal);
+    function Portal() {
+        _classCallCheck(this, Portal);
 
-		_get(Object.getPrototypeOf(Portal.prototype), 'constructor', this).call(this);
-		this.portalElement = null;
-	}
+        _get(Object.getPrototypeOf(Portal.prototype), 'constructor', this).call(this);
+        this.portalElement = null;
+    }
 
-	_createClass(Portal, [{
-		key: 'componentDidMount',
-		value: function componentDidMount() {
-			var p = document.createElement('div');
-			document.body.appendChild(p);
-			this.portalElement = p;
-			this.componentDidUpdate();
-		}
-	}, {
-		key: 'componentDidUpdate',
-		value: function componentDidUpdate() {
-			// Animate fade on mount/unmount
-			var duration = 200;
-			var styles = '\n\t\t\t\t.fade-enter { opacity: 0.01; }\n\t\t\t\t.fade-enter.fade-enter-active { opacity: 1; transition: opacity ' + duration + 'ms; }\n\t\t\t\t.fade-leave { opacity: 1; }\n\t\t\t\t.fade-leave.fade-leave-active { opacity: 0.01; transition: opacity ' + duration + 'ms; }\n\t\t';
+    _createClass(Portal, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var p = document.createElement('div');
 
-			(0, _reactDom.render)(_react2['default'].createElement(
-				_PassContext2['default'],
-				{ context: this.context },
-				_react2['default'].createElement(
-					'div',
-					null,
-					_react2['default'].createElement(
-						'style',
-						null,
-						styles
-					),
-					_react2['default'].createElement(_reactTransitionGroupCSSTransitionGroup2['default'], _extends({
-						component: 'div',
-						transitionName: 'fade',
-						transitionEnterTimeout: duration,
-						transitionLeaveTimeout: duration
-					}, this.props))
-				)
-			), this.portalElement);
-		}
-	}, {
-		key: 'componentWillUnmount',
-		value: function componentWillUnmount() {
-			document.body.removeChild(this.portalElement);
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			return null;
-		}
-	}]);
+            document.body.appendChild(p);
+            this.portalElement = p;
+            this.componentDidUpdate();
+        }
+    }, {
+        key: 'componentDidUpdate',
+        value: function componentDidUpdate() {
+            // Animate fade on mount/unmount
+            var duration = 200,
+                styles = '\n                .fade-enter { opacity: 0.01; }\n                .fade-enter.fade-enter-active { opacity: 1; transition: opacity ' + duration + 'ms; }\n                .fade-leave { opacity: 1; }\n                .fade-leave.fade-leave-active { opacity: 0.01; transition: opacity ' + duration + 'ms; }\n            ';
 
-	return Portal;
+            (0, _reactDom.render)(_react2['default'].createElement(
+                _PassContext2['default'],
+                { context: this.context },
+                _react2['default'].createElement(
+                    'div',
+                    null,
+                    _react2['default'].createElement(
+                        'style',
+                        null,
+                        styles
+                    ),
+                    _react2['default'].createElement(_reactTransitionGroupCSSTransitionGroup2['default'], _extends({
+                        component: 'div',
+                        transitionName: 'fade',
+                        transitionEnterTimeout: duration,
+                        transitionLeaveTimeout: duration
+                    }, this.props))
+                )
+            ), this.portalElement);
+        }
+    }, {
+        key: 'componentWillUnmount',
+        value: function componentWillUnmount() {
+            document.body.removeChild(this.portalElement);
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            return null;
+        }
+    }]);
+
+    return Portal;
 })(_react.Component);
 
 exports['default'] = Portal;
 
 Portal.contextTypes = {
-	theme: _propTypes2['default'].object.isRequired
+    theme: _propTypes2['default'].object.isRequired
 };
 module.exports = exports['default'];
 
@@ -3936,7 +3959,7 @@ module.exports = exports['default'];
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
-	value: true
+    value: true
 });
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -3958,55 +3981,55 @@ var _theme2 = _interopRequireDefault(_theme);
 var _utils = require('../utils');
 
 function Thumbnail(_ref, _ref2) {
-	var index = _ref.index;
-	var src = _ref.src;
-	var thumbnail = _ref.thumbnail;
-	var active = _ref.active;
-	var onClick = _ref.onClick;
-	var theme = _ref2.theme;
+    var index = _ref.index;
+    var src = _ref.src;
+    var thumbnail = _ref.thumbnail;
+    var active = _ref.active;
+    var onClick = _ref.onClick;
+    var theme = _ref2.theme;
 
-	var url = thumbnail ? thumbnail : src;
-	var classes = _aphroditeNoImportant.StyleSheet.create((0, _utils.deepMerge)(defaultStyles, theme));
+    var url = thumbnail ? thumbnail : src,
+        classes = _aphroditeNoImportant.StyleSheet.create((0, _utils.deepMerge)(defaultStyles, theme));
 
-	return _react2['default'].createElement('div', {
-		className: (0, _aphroditeNoImportant.css)(classes.thumbnail, active && classes.thumbnail__active),
-		onClick: function (e) {
-			e.preventDefault();
-			e.stopPropagation();
-			onClick(index);
-		},
-		style: { backgroundImage: 'url("' + url + '")' }
-	});
+    return _react2['default'].createElement('div', {
+        className: (0, _aphroditeNoImportant.css)(classes.thumbnail, active && classes.thumbnail__active),
+        onClick: function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            onClick(index);
+        },
+        style: { backgroundImage: 'url("' + url + '")' }
+    });
 }
 
 Thumbnail.propTypes = {
-	active: _propTypes2['default'].bool,
-	index: _propTypes2['default'].number,
-	onClick: _propTypes2['default'].func.isRequired,
-	src: _propTypes2['default'].string,
-	thumbnail: _propTypes2['default'].string
+    active: _propTypes2['default'].bool,
+    index: _propTypes2['default'].number,
+    onClick: _propTypes2['default'].func.isRequired,
+    src: _propTypes2['default'].string,
+    thumbnail: _propTypes2['default'].string
 };
 
 Thumbnail.contextTypes = {
-	theme: _propTypes2['default'].object.isRequired
+    theme: _propTypes2['default'].object.isRequired
 };
 
 var defaultStyles = {
-	thumbnail: {
-		backgroundPosition: 'center',
-		backgroundSize: 'cover',
-		borderRadius: 2,
-		boxShadow: 'inset 0 0 0 1px hsla(0,0%,100%,.2)',
-		cursor: 'pointer',
-		display: 'inline-block',
-		height: _theme2['default'].thumbnail.size,
-		margin: _theme2['default'].thumbnail.gutter,
-		overflow: 'hidden',
-		width: _theme2['default'].thumbnail.size
-	},
-	thumbnail__active: {
-		boxShadow: 'inset 0 0 0 2px ' + _theme2['default'].thumbnail.activeBorderColor
-	}
+    thumbnail: {
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+        borderRadius: 2,
+        boxShadow: 'inset 0 0 0 1px hsla(0,0%,100%,.2)',
+        cursor: 'pointer',
+        display: 'inline-block',
+        height: _theme2['default'].thumbnail.size,
+        margin: _theme2['default'].thumbnail.gutter,
+        overflow: 'hidden',
+        width: _theme2['default'].thumbnail.size
+    },
+    thumbnail__active: {
+        boxShadow: 'inset 0 0 0 2px ' + _theme2['default'].thumbnail.activeBorderColor
+    }
 };
 
 exports['default'] = Thumbnail;
@@ -4017,11 +4040,11 @@ module.exports = exports['default'];
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+    value: true
 });
 
 exports["default"] = function (fill) {
-	return "<svg fill=\"" + fill + "\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\" width=\"100%\" height=\"100%\" viewBox=\"0 0 512 512\" xml:space=\"preserve\">\n\t\t<path d=\"M213.7,256L213.7,256L213.7,256L380.9,81.9c4.2-4.3,4.1-11.4-0.2-15.8l-29.9-30.6c-4.3-4.4-11.3-4.5-15.5-0.2L131.1,247.9 c-2.2,2.2-3.2,5.2-3,8.1c-0.1,3,0.9,5.9,3,8.1l204.2,212.7c4.2,4.3,11.2,4.2,15.5-0.2l29.9-30.6c4.3-4.4,4.4-11.5,0.2-15.8 L213.7,256z\"/>\n\t</svg>";
+    return "<svg fill=\"" + fill + "\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\" width=\"100%\" height=\"100%\" viewBox=\"0 0 512 512\" xml:space=\"preserve\">\n        <path d=\"M213.7,256L213.7,256L213.7,256L380.9,81.9c4.2-4.3,4.1-11.4-0.2-15.8l-29.9-30.6c-4.3-4.4-11.3-4.5-15.5-0.2L131.1,247.9 c-2.2,2.2-3.2,5.2-3,8.1c-0.1,3,0.9,5.9,3,8.1l204.2,212.7c4.2,4.3,11.2,4.2,15.5-0.2l29.9-30.6c4.3-4.4,4.4-11.5,0.2-15.8 L213.7,256z\"/>\n    </svg>";
 };
 
 module.exports = exports["default"];
@@ -4030,11 +4053,11 @@ module.exports = exports["default"];
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+    value: true
 });
 
 exports["default"] = function (fill) {
-	return "<svg fill=\"" + fill + "\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\" width=\"100%\" height=\"100%\" viewBox=\"0 0 512 512\" xml:space=\"preserve\">\n\t\t<path d=\"M298.3,256L298.3,256L298.3,256L131.1,81.9c-4.2-4.3-4.1-11.4,0.2-15.8l29.9-30.6c4.3-4.4,11.3-4.5,15.5-0.2l204.2,212.7 c2.2,2.2,3.2,5.2,3,8.1c0.1,3-0.9,5.9-3,8.1L176.7,476.8c-4.2,4.3-11.2,4.2-15.5-0.2L131.3,446c-4.3-4.4-4.4-11.5-0.2-15.8 L298.3,256z\"/>\n\t</svg>";
+    return "<svg fill=\"" + fill + "\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\" width=\"100%\" height=\"100%\" viewBox=\"0 0 512 512\" xml:space=\"preserve\">\n        <path d=\"M298.3,256L298.3,256L298.3,256L131.1,81.9c-4.2-4.3-4.1-11.4,0.2-15.8l29.9-30.6c4.3-4.4,11.3-4.5,15.5-0.2l204.2,212.7 c2.2,2.2,3.2,5.2,3,8.1c0.1,3-0.9,5.9-3,8.1L176.7,476.8c-4.2,4.3-11.2,4.2-15.5-0.2L131.3,446c-4.3-4.4-4.4-11.5-0.2-15.8 L298.3,256z\"/>\n    </svg>";
 };
 
 module.exports = exports["default"];
@@ -4043,11 +4066,11 @@ module.exports = exports["default"];
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+    value: true
 });
 
 exports["default"] = function (fill) {
-	return "<svg fill=\"" + fill + "\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\" width=\"100%\" height=\"100%\" viewBox=\"0 0 512 512\" style=\"enable-background:new 0 0 512 512;\" xml:space=\"preserve\">\n\t\t<path d=\"M443.6,387.1L312.4,255.4l131.5-130c5.4-5.4,5.4-14.2,0-19.6l-37.4-37.6c-2.6-2.6-6.1-4-9.8-4c-3.7,0-7.2,1.5-9.8,4 L256,197.8L124.9,68.3c-2.6-2.6-6.1-4-9.8-4c-3.7,0-7.2,1.5-9.8,4L68,105.9c-5.4,5.4-5.4,14.2,0,19.6l131.5,130L68.4,387.1 c-2.6,2.6-4.1,6.1-4.1,9.8c0,3.7,1.4,7.2,4.1,9.8l37.4,37.6c2.7,2.7,6.2,4.1,9.8,4.1c3.5,0,7.1-1.3,9.8-4.1L256,313.1l130.7,131.1 c2.7,2.7,6.2,4.1,9.8,4.1c3.5,0,7.1-1.3,9.8-4.1l37.4-37.6c2.6-2.6,4.1-6.1,4.1-9.8C447.7,393.2,446.2,389.7,443.6,387.1z\"/>\n\t</svg>";
+    return "<svg fill=\"" + fill + "\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\" width=\"100%\" height=\"100%\" viewBox=\"0 0 512 512\" style=\"enable-background:new 0 0 512 512;\" xml:space=\"preserve\">\n        <path d=\"M443.6,387.1L312.4,255.4l131.5-130c5.4-5.4,5.4-14.2,0-19.6l-37.4-37.6c-2.6-2.6-6.1-4-9.8-4c-3.7,0-7.2,1.5-9.8,4 L256,197.8L124.9,68.3c-2.6-2.6-6.1-4-9.8-4c-3.7,0-7.2,1.5-9.8,4L68,105.9c-5.4,5.4-5.4,14.2,0,19.6l131.5,130L68.4,387.1 c-2.6,2.6-4.1,6.1-4.1,9.8c0,3.7,1.4,7.2,4.1,9.8l37.4,37.6c2.7,2.7,6.2,4.1,9.8,4.1c3.5,0,7.1-1.3,9.8-4.1L256,313.1l130.7,131.1 c2.7,2.7,6.2,4.1,9.8,4.1c3.5,0,7.1-1.3,9.8-4.1l37.4-37.6c2.6-2.6,4.1-6.1,4.1-9.8C447.7,393.2,446.2,389.7,443.6,387.1z\"/>\n    </svg>";
 };
 
 module.exports = exports["default"];
@@ -4056,9 +4079,9 @@ module.exports = exports["default"];
 'use strict';
 
 module.exports = {
-	arrowLeft: require('./arrowLeft'),
-	arrowRight: require('./arrowRight'),
-	close: require('./close')
+    arrowLeft: require('./arrowLeft'),
+    arrowRight: require('./arrowRight'),
+    close: require('./close')
 };
 
 },{"./arrowLeft":50,"./arrowRight":51,"./close":52}],54:[function(require,module,exports){
@@ -4072,73 +4095,73 @@ var theme = {};
 
 // container
 theme.container = {
-	background: 'rgba(0, 0, 0, 0.8)',
-	gutter: {
-		horizontal: 10,
-		vertical: 10
-	},
-	zIndex: 2001
+    background: 'rgba(0, 0, 0, 0.8)',
+    gutter: {
+        horizontal: 10,
+        vertical: 10
+    },
+    zIndex: 2001
 };
 
 // header
 theme.header = {
-	height: 40
+    height: 40
 };
 theme.close = {
-	fill: 'white'
+    fill: 'white'
 };
 
 // footer
 theme.footer = {
-	color: 'white',
-	count: {
-		color: 'rgba(255, 255, 255, 0.75)',
-		fontSize: '0.85em'
-	},
-	height: 40,
-	gutter: {
-		horizontal: 0,
-		vertical: 5
-	}
+    color: 'white',
+    count: {
+        color: 'rgba(255, 255, 255, 0.75)',
+        fontSize: '0.85em'
+    },
+    height: 40,
+    gutter: {
+        horizontal: 0,
+        vertical: 5
+    }
 };
 
 // thumbnails
 theme.thumbnail = {
-	activeBorderColor: 'white',
-	size: 50,
-	gutter: 2
+    activeBorderColor: 'white',
+    size: 50,
+    gutter: 2
 };
 
 // arrow
 theme.arrow = {
-	background: 'black',
-	fill: 'white',
-	height: 120
+    background: 'black',
+    fill: 'white',
+    height: 120
 };
 
 module.exports = theme;
 
 },{}],55:[function(require,module,exports){
 /**
-	Bind multiple component methods:
+    Bind multiple component methods:
 
-	* @param {this} context
-	* @param {Array} functions
+    * @param {this} context
+    * @param {Array} functions
 
-	constructor() {
-		...
-		bindFunctions.call(this, ['handleClick', 'handleOther']);
-	}
+    constructor() {
+        ...
+        bindFunctions.call(this, ['handleClick', 'handleOther']);
+    }
 */
 
 "use strict";
 
 module.exports = function bindFunctions(functions) {
-	var _this = this;
+    var _this = this;
 
-	functions.forEach(function (f) {
-		return _this[f] = _this[f].bind(_this);
-	});
+    functions.forEach(function (f) {
+        return _this[f] = _this[f].bind(_this);
+    });
 };
 
 },{}],56:[function(require,module,exports){
@@ -4154,23 +4177,23 @@ module.exports = !!(typeof window !== 'undefined' && window.document && window.d
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function deepMerge(target) {
-	var source = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+    var source = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-	var extended = _extends({}, target);
+    var extended = _extends({}, target);
 
-	Object.keys(source).forEach(function (key) {
-		if (typeof source[key] !== 'object' || !source[key]) {
-			extended[key] = source[key];
-		} else {
-			if (!target[key]) {
-				extended[key] = source[key];
-			} else {
-				extended[key] = deepMerge(target[key], source[key]);
-			}
-		}
-	});
+    Object.keys(source).forEach(function (key) {
+        if (typeof source[key] !== 'object' || !source[key]) {
+            extended[key] = source[key];
+        } else {
+            if (!target[key]) {
+                extended[key] = source[key];
+            } else {
+                extended[key] = deepMerge(target[key], source[key]);
+            }
+        }
+    });
 
-	return extended;
+    return extended;
 }
 
 module.exports = deepMerge;
@@ -4193,9 +4216,9 @@ var _deepMerge = require('./deepMerge');
 var _deepMerge2 = _interopRequireDefault(_deepMerge);
 
 module.exports = {
-	bindFunctions: _bindFunctions2['default'],
-	canUseDom: _canUseDom2['default'],
-	deepMerge: _deepMerge2['default']
+    bindFunctions: _bindFunctions2['default'],
+    canUseDom: _canUseDom2['default'],
+    deepMerge: _deepMerge2['default']
 };
 
 },{"./bindFunctions":55,"./canUseDom":56,"./deepMerge":57}]},{},[40])(40)
